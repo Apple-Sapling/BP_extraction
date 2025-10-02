@@ -97,7 +97,7 @@ def extract_author_info(author_blurb):
         text = a.text
         if ' in ' in text:
             works_fandom = text
-        elif 'bookmark':
+        elif 'bookmark' in text:
             bookmarks = text
         else:
             works_all = text
