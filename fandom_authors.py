@@ -144,7 +144,7 @@ def update_url_to_next_page():
 
 def write_ids_to_csv(ids):
     global num_recorded_authors
-    with open(csv_name + ".csv", 'a', newline="") as csvfile:
+    with open(csv_name + ".csv", 'a', newline="", encoding="utf-8") as csvfile:
         wr = csv.writer(csvfile, delimiter=',')
         for id in ids:
             wr.writerow([id['author'], id['pseud'], id['author_link'], id['pseud_link'], id["works_all"], id["works_in_fandom"], id["bookmarks"]])
@@ -156,7 +156,7 @@ def not_finished():
     return num_requested_authors == -1 or num_recorded_authors < num_requested_authors
 
 def make_readme():
-    with open(csv_name + "_readme.txt", "a") as text_file:
+    with open(csv_name + "_readme.txt", "a", encoding="utf-8") as text_file:
         text_file.write(f"\nretrieved on: {datetime.datetime.now()}\nnum_requested_authors: {num_requested_authors}\nurl: {url}\n")
 
 def reset():
@@ -180,13 +180,13 @@ def load_existing_ids():
     new_url = ""
     if os.path.exists(csv_name + ".csv"):
         print("Loading existing IDs to avoid duplicates...\n")
-        with open(csv_name + ".csv", 'r') as csvfile:
+        with open(csv_name + ".csv", 'r', encoding="utf-8") as csvfile:
             id_reader = csv.reader(csvfile)
             for row in id_reader:
                 seen_ids.add(f"{row[0]}/{row[1]}")
     else:
         print("No existing file found; creating new file...\n")
-        with open(csv_name + ".csv", 'a', newline="") as csvfile:
+        with open(csv_name + ".csv", 'a', newline="", encoding="utf-8") as csvfile:
             wr = csv.writer(csvfile, delimiter=',')
             wr.writerow(['author', 'pseud', 'author link', 'pseud link', 'works', 'works in fandom', 'bookmarks'])
 
