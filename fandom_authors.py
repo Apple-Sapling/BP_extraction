@@ -21,17 +21,19 @@ num_recorded_authors = 0
 csv_name = ""
 continue_csv = False
 seen_ids = set()
+user_agent = ""
 
 def get_args():
     global url
     global csv_name
     global num_requested_authors
     global continue_csv
+    global user_agent
 
     parser = argparse.ArgumentParser(description='Scrape AO3 authors given a people search URL')
     parser.add_argument('url', metavar='URL', help='a single URL pointing to an AO3 search page')
     parser.add_argument('--out_csv', default='author_ids', help='csv output file name')
-    parser.add_argument('--header', default='', help='user http header')
+    parser.add_argument('--header', default='Mozilla/5.0', help='user agent http header')
     parser.add_argument('--continue_csv', default='', help='pick up where the csv file left off')
     parser.add_argument('--num_to_retrieve', default='20', help='how many author ids you want')
 
@@ -40,15 +42,14 @@ def get_args():
     csv_name = str(args.out_csv)
     continue_csv = bool(args.continue_csv)
     num_requested_authors = int(args.num_to_retrieve)
-    header_info = str(args.header)
+    user_agent = str(args.header)
 
-    return header_info
-
-def get_ids(header_info=''):
+def get_ids():
     global page_empty
     global seen_ids
+    global user_agent
 
-    headers = {'user-agent': header_info}
+    headers = {'user-agent': user_agent}
     req = requests.get(url, headers=headers)
     while req.status_code == 429:
         print("Request answered with Status-Code 429, waiting before retrying...")
@@ -165,10 +166,10 @@ def reset():
     page_empty = False
     num_recorded_authors = 0
 
-def process_for_ids(header_info=''):
+def process_for_ids():
     while not_finished():
         time.sleep(5)  # 5-second delay to respect AO3's TOS
-        ids = get_ids(header_info)
+        ids = get_ids()
         write_ids_to_csv(ids)
         update_url_to_next_page()
 
@@ -191,12 +192,13 @@ def load_existing_ids():
             wr.writerow(['author', 'pseud', 'author link', 'pseud link', 'works', 'works in fandom', 'bookmarks'])
 
 def main():
-    header_info = get_args()
+    get_args()
     make_readme()
     print("Loading existing file...\n")
     load_existing_ids()
     print("Processing...\n")
-    process_for_ids(header_info)
+    process_for_ids()
     print("Done.")
 
-main()
+if __name__ == "__main__":
+    main()
